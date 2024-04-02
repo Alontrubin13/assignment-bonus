@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: api
+  name: back
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api  # Moved 'app: back' under 'labels'
+    spec:
+      containers:
+      - image: alontrubin13/quotes-back:v4
+        name: api
+        ports:
+        - containerPort: 3000
+        env:
+          - name: SQLALCHEMY_DATABASE_URI
+            valueFrom:
+              secretKeyRef:
+                name: back-secret
+                key: SQLALCHEMY_DATABASE_URI
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
